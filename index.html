@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa Go-NoGo - Teste de Controle Inibitório</title>
+    <meta name="description" content="Teste psicológico Go-NoGo para avaliação de controle inibitório e atenção sustentada">
+    <meta name="author" content="Laboratório de Neurociência Cognitiva">
+    
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-hover: #45a049;
+            --secondary-color: #3498db;
+            --secondary-hover: #2980b9;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #27ae60;
+            --text-color: #333;
+            --bg-color: #f5f5f5;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 10px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+
+        #container {
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            text-align: center;
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 2em;
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .instructions ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        #estimulo {
+            width: 180px;
+            height: 180px;
+            margin: 2rem auto;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #estimulo:hover {
+            transform: scale(1.05);
+        }
+
+        #mensagem {
+            font-size: 1.3em;
+            margin: 1.5rem 0;
+            font-weight: 600;
+            min-height: 2em;
+            color: #2c3e50;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 1em;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background-color: var(--secondary-color);
+        }
+
+        button.secondary:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        #resultados {
+            margin-top: 2rem;
+            text-align: left;
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #resultados h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .resultado-item {
+            margin-bottom: 0.8rem;
+            padding: 0.5rem;
+            background-color: white;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resultado-valor {
+            font-weight: bold;
+            color: var(--secondary-color);
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            margin: 1.5rem 0;
+            display: none;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            padding: 0.7rem;
+            font-size: 1em;
+            width: 100%;
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+
+        #fullscreen-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(52, 152, 219, 0.9);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        #fullscreen-btn:hover {
+            background-color: var(--secondary-hover);
+            transform: scale(1.05);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 2rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-size: 1.5em;
+            font-weight: bold;
+            display: none;
+            z-index: 2000;
+        }
+
+        .feedback.correct {
+            color: var(--success-color);
+            border: 3px solid var(--success-color);
+        }
+
+        .feedback.incorrect {
+            color: var(--danger-color);
+            border: 3px solid var(--danger-color);
+        }
+
+        @media (max-width: 600px) {
+            #container {
+                padding: 1.5rem;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            #estimulo {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Tarefa Go-NoGo</h1>
+        
+        <div class="instructions" id="instrucoes">
+            <h3>Instruções:</h3>
+            <ul>
+                <li>Círculos <strong>coloridos</strong> (vermelho, verde, azul) = <strong>CLIQUE</strong> o mais rápido possível</li>
+                <li>Círculo <strong>preto</strong> = <strong>NÃO CLIQUE</strong></li>
+                <li>Seja rápido mas também preciso!</li>
+                <li>O teste dura aproximadamente 3-5 minutos</li>
+            </ul>
+        </div>
+
+        <div id="mensagem">Escolha o tipo de teste:</div>
+        
+        <div class="button-group" id="botoes-inicio">
+            <button onclick="iniciarTeste(true)">Teste Reduzido (36 tentativas)</button>
+            <button onclick="iniciarTeste(false)" class="secondary">Teste Completo (72 tentativas)</button>
+        </div>
+
+        <div class="progress-bar" id="barra-progresso">
+            <div class="progress-fill" id="progresso"></div>
+        </div>
+
+        <div id="estimulo"></div>
+
+        <div id="resultados">
+            <h2>Resultados do Teste</h2>
+            <div class="stats-container" id="stats-container"></div>
+            <div id="resultados-detalhados"></div>
+        </div>
+
+        <div class="input-group" id="input-group">
+            <label for="id-input">Identificador do Participante:</label>
+            <input type="text" id="id-input" placeholder="Ex: P001" required>
+            <div class="button-group" style="margin-top: 1rem;">
+                <button onclick="gerarCSVDetalhado()" class="secondary">📊 Baixar Dados Detalhados</button>
+                <button onclick="gerarCSVResumido()" class="secondary">📈 Baixar Resumo</button>
+                <button onclick="salvarLocalStorage()" class="secondary">💾 Salvar Localmente</button>
+                <button onclick="reiniciar()" class="danger">🔄 Novo Teste</button>
+            </div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+    </div>
+
+    <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ Tela Cheia</button>
+
+    <script>
+        // Configurações do teste
+        const CONFIG = {
+            DURACAO_ESTIMULO: 1000,
+            INTERVALO_INTER_ESTIMULO: 700,
+            TEMPO_PREPARACAO: 2000,
+            CORES_GO: ['#FF6B6B', '#4ECDC4', '#45B7D1'],
+            COR_NOGO: '#2C3E50',
+            FREQUENCIA_SOM_CORRETO: 800,
+            FREQUENCIA_SOM_ERRO: 200,
+            DURACAO_FEEDBACK: 300
+        };
+
+        // Estado global
+        let estado = {
+            tentativas: [],
+            indiceTentativa: 0,
+            tempoInicio: null,
+            testeEmAndamento: false,
+            testeReduzido: true,
+            respostaDada: false,
+            dadosParticipante: {},
+            audioContext: null
+        };
+
+        // Inicialização do AudioContext
+        function inicializarAudio() {
+            if (!estado.audioContext) {
+                estado.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        // Gerenciamento de tela cheia
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log('Erro ao entrar em tela cheia:', err);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const btn = document.getElementById('fullscreen-btn');
+            btn.textContent = document.fullscreenElement ? '⛶ Sair da Tela Cheia' : '⛶ Tela Cheia';
+        });
+
+        // Criação das tentativas
+        function criarTentativas(reduzido) {
+            const numeroTentativasGo = reduzido ? 24 : 48;
+            const numeroTentativasNoGo = reduzido ? 12 : 24;
+            estado.tentativas = [];
+
+            // Criar tentativas Go
+            for (let i = 0; i < numeroTentativasGo; i++) {
+                const corIndex = i % CONFIG.CORES_GO.length;
+                estado.tentativas.push({
+                    id: i + 1,
+                    condicao: 'go',
+                    estimulo: CONFIG.CORES_GO[corIndex],
+                    estimuloNome: ['vermelho', 'verde', 'azul'][corIndex],
+                    response: null,
+                    rt: null,
+                    acuracia: null,
+                    timestamp: null
+                });
+            }
+
+            // Criar tentativas NoGo
+            for (let i = 0; i < numeroTentativasNoGo; i++) {
+                estado.tentativas.push({
+                    id: numeroTentativasGo + i + 1,
+                    condicao: 'nogo',
+                    estimulo: CONFIG.COR_NOGO,
+                    estimuloNome: 'preto',
+                    response: null,
+                    rt: null,
+                    acuracia: null,
+                    timestamp: null
+                });
+            }
+
+            // Embaralhar usando Fisher-Yates
+            for (let i = estado.tentativas.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [estado.tentativas[i], estado.tentativas[j]] = [estado.tentativas[j], estado.tentativas[i]];
+            }
+
+            // Renumerar IDs após embaralhamento
+            estado.tentativas.forEach((tent, idx) => {
+                tent.ordemApresentacao = idx + 1;
+            });
+        }
+
+        // Iniciar teste
+        function iniciarTeste(reduzido) {
+            if (estado.testeEmAndamento) return;
+
+            inicializarAudio();
+            estado.testeEmAndamento = true;
+            estado.testeReduzido = reduzido;
+            estado.indiceTentativa = 0;
+            estado.dadosParticipante = {
+                dataInicio: new Date().toISOString(),
+                tipoTeste: reduzido ? 'reduzido' : 'completo',
+                navegador: navigator.userAgent,
+                resolucaoTela: `${screen.width}x${screen.height}`
+            };
+
+            // Ocultar elementos iniciais
+            document.getElementById('botoes-inicio').style.display = 'none';
+            document.getElementById('instrucoes').style.display = 'none';
+            document.getElementById('barra-progresso').style.display = 'block';
+            
+            // Mensagem de preparação
+            document.getElementById('mensagem').textContent = 'Prepare-se... O teste vai começar!';
+            
+            criarTentativas(reduzido);
+            
+            setTimeout(() => {
+                proximaTentativa();
+            }, CONFIG.TEMPO_PREPARACAO);
+        }
+
+        // Próxima tentativa
+        function proximaTentativa() {
+            if (estado.indiceTentativa >= estado.tentativas.length) {
+                finalizarTeste();
+                return;
+            }
+
+            // Atualizar barra de progresso
+            const progresso = (estado.indiceTentativa / estado.tentativas.length) * 100;
+            document.getElementById('progresso').style.width = `${progresso}%`;
+
+            const tentativa = estado.tentativas[estado.indiceTentativa];
+            const estimuloDiv = document.getElementById('estimulo');
+            
+            // Mostrar estímulo
+            estimuloDiv.style.backgroundColor = tentativa.estimulo;
+            estimuloDiv.classList.add('pulse');
+            
+            document.getElementById('mensagem').textContent = `Tentativa ${estado.indiceTentativa + 1} de ${estado.tentativas.length}`;
+            
+            estado.tempoInicio = performance.now();
+            estado.respostaDada = false;
+            tentativa.timestamp = new Date().toISOString();
+
+            // Remover estímulo após duração definida
+            setTimeout(() => {
+                estimuloDiv.style.backgroundColor = 'transparent';
+                estimuloDiv.classList.remove('pulse');
+                
+                // Verificar se houve resposta
+                if (!estado.respostaDada) {
+                    tentativa.response = 'sem_resposta';
+                    tentativa.rt = null;
+                    tentativa.acuracia = (tentativa.condicao === 'nogo') ? 1 : 0;
+                }
+
+                // Intervalo inter-estímulo
+                setTimeout(() => {
+                    estado.indiceTentativa++;
+                    proximaTentativa();
+                }, CONFIG.INTERVALO_INTER_ESTIMULO);
+            }, CONFIG.DURACAO_ESTIMULO);
+        }
+
+        // Registrar resposta
+        document.getElementById('estimulo').addEventListener('click', function() {
+            if (!estado.testeEmAndamento || estado.respostaDada) return;
+            
+            const tempoAtual = performance.now();
+            const rt = Math.round(tempoAtual - estado.tempoInicio);
+            const tentativa = estado.tentativas[estado.indiceTentativa];
+            
+            estado.respostaDada = true;
+            tentativa.response = 'clique';
+            tentativa.rt = rt;
+            tentativa.acuracia = (tentativa.condicao === 'go') ? 1 : 0;
+            
+            // Feedback visual e sonoro
+            mostrarFeedback(tentativa.acuracia === 1);
+            tocarSom(tentativa.acuracia === 1 ? CONFIG.FREQUENCIA_SOM_CORRETO : CONFIG.FREQUENCIA_SOM_ERRO);
+        });
+
+        // Mostrar feedback visual
+        function mostrarFeedback(correto) {
+            const feedbackDiv = document.getElementById('feedback');
+            feedbackDiv.textContent = correto ? '✓' : '✗';
+            feedbackDiv.className = correto ? 'feedback correct' : 'feedback incorrect';
+            feedbackDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                feedbackDiv.style.display = 'none';
+            }, CONFIG.DURACAO_FEEDBACK);
+        }
+
+        // Tocar som
+        function tocarSom(frequencia) {
+            if (!estado.audioContext) return;
+            
+            const oscillator = estado.audioContext.createOscillator();
+            const gainNode = estado.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(estado.audioContext.destination);
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequencia;
+            
+            gainNode.gain.setValueAtTime(0.3, estado.audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, estado.audioContext.currentTime + 0.1);
+            
+            oscillator.start(estado.audioContext.currentTime);
+            oscillator.stop(estado.audioContext.currentTime + 0.1);
+        }
+
+        // Finalizar teste
+        function finalizarTeste() {
+            estado.testeEmAndamento = false;
+            estado.dadosParticipante.dataFim = new Date().toISOString();
+            
+            document.getElementById('mensagem').textContent = 'Teste Concluído! ';
+            document.getElementById('barra-progresso').style.display = 'none';
+            document.getElementById('estimulo').style.display = 'none';
+            document.getElementById('input-group').style.display = 'block';
+            document.getElementById('resultados').style.display = 'block';
+            
+            calcularEExibirResultados();
+        }
+
+        // Calcular e exibir resultados
+        function calcularEExibirResultados() {
+            const resultados = calcularResultados();
+            
+            // Exibir estatísticas principais
+            const statsContainer = document.getElementById('stats-container');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Acertos Go</div>
+                    <div class="stat-value">${resultados.taxaAcertosGo.toFixed(0)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">TR Médio</div>
+                    <div class="stat-value">${resultados.tempoReacaoMedio.toFixed(0)}ms</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Erros Omissão</div>
+                    <div class="stat-value">${resultados.taxaErrosOmissao.toFixed(0)}%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Erros Comissão</div>
+                    <div class="stat-value">${resultados.taxaErrosComissao.toFixed(0)}%</div>
+                </div>
+            `;
+            
+            // Exibir resultados detalhados
+            const resultadosDiv = document.getElementById('resultados-detalhados');
+            resultadosDiv.innerHTML = `
+                <div class="resultado-item">
+                    <span>Índice de discriminação (d')</span>
+                    <span class="resultado-valor">${resultados.dPrime.toFixed(2)}</span>
+                </div>
+                <div class="resultado-item">
+                    <span>Viés de resposta (β)</span>
+                    <span class="resultado-valor">${resultados.beta.toFixed(2)}</span>
+                </div>
+                <div class="resultado-item">
+                    <span>Variabilidade TR (SD)</span>
+                    <span class="resultado-valor">${resultados.variabilidadeRt.toFixed(0)} ms</span>
+                </div>
+                <div class="resultado-item">
+                    <span>Total de tentativas</span>
+                    <span class="resultado-valor">${estado.tentativas.length}</span>
+                </div>
+            `;
+            
+            estado.resultadosCalculados = resultados;
+        }
+
+        // Cálculos estatísticos
+        function calcularResultados() {
+            let acertosGo = 0, errosOmissao = 0, errosComissao = 0;
+            let totalGo = 0, totalNoGo = 0;
+            let temposReacao = [];
+            
+            estado.tentativas.forEach(tent => {
+                if (tent.condicao === 'go') {
+                    totalGo++;
+                    if (tent.acuracia === 1) {
+                        acertosGo++;
+                        if (tent.rt) temposReacao.push(tent.rt);
+                    } else {
+                        errosOmissao++;
+                    }
+                } else {
+                    totalNoGo++;
+                    if (tent.acuracia === 0) {
+                        errosComissao++;
+                    }
+                }
+            });
+            
+            // Cálculos básicos
+            const taxaAcertosGo = (acertosGo / totalGo) * 100;
+            const taxaErrosOmissao = (errosOmissao / totalGo) * 100;
+            const taxaErrosComissao = (errosComissao / totalNoGo) * 100;
+            
+            // Tempo de reação
+            const tempoReacaoMedio = temposReacao.length > 0 ? 
+                temposReacao.reduce((a, b) => a + b, 0) / temposReacao.length : 0;
+            
+            const variabilidadeRt = temposReacao.length > 1 ? 
+                Math.sqrt(temposReacao.reduce((acc, val) => 
+                    acc + Math.pow(val - tempoReacaoMedio, 2), 0) / (temposReacao.length - 1)) : 0;
+            
+            // Teoria de Detecção de Sinal
+            const hitRate = Math.min(Math.max(acertosGo / totalGo, 0.01), 0.99);
+            const faRate = Math.min(Math.max(errosComissao / totalNoGo, 0.01), 0.99);
+            
+            const dPrime = calcularDPrime(hitRate, faRate);
+            const beta = calcularBeta(hitRate, faRate);
+            
+            return {
+                taxaAcertosGo,
+                taxaErrosOmissao,
+                taxaErrosComissao,
+                tempoReacaoMedio,
+                variabilidadeRt,
+                dPrime,
+                beta,
+                acertosGo,
+                errosOmissao,
+                errosComissao,
+                totalGo,
+                totalNoGo,
+                temposReacao
+            };
+        }
+
+        // Cálculo d-prime
+        function calcularDPrime(hitRate, faRate) {
+            return norminv(hitRate) - norminv(faRate);
+        }
+
+        // Cálculo beta
+        function calcularBeta(hitRate, faRate) {
+            const zHit = norminv(hitRate);
+            const zFa = norminv(faRate);
+            return Math.exp(-0.5 * (zHit * zHit - zFa * zFa));
+        }
+
+        // Função inversa da distribuição normal
+        function norminv(p) {
+            const a1 = -3.969683028665376e+01;
+            const a2 = 2.209460984245205e+02;
+            const a3 = -2.759285104469687e+02;
+            const a4 = 1.383577518672690e+02;
+            const a5 = -3.066479806614716e+01;
+            const a6 = 2.506628277459239e+00;
+            
+            const b1 = -5.447609879822406e+01;
+            const b2 = 1.615858368580409e+02;
+            const b3 = -1.556989798598866e+02;
+            const b4 = 6.680131188771972e+01;
+            const b5 = -1.328068155288572e+01;
+            
+            const c1 = -7.784894002430293e-03;
+            const c2 = -3.223964580411365e-01;
+            const c3 = -2.400758277161838e+00;
+            const c4 = -2.549732539343734e+00;
+            const c5 = 4.374664141464968e+00;
+            const c6 = 2.938163982698783e+00;
+            
+            const d1 = 7.784695709041462e-03;
+            const d2 = 3.224671290700398e-01;
+            const d3 = 2.445134137142996e+00;
+            const d4 = 3.754408661907416e+00;
+            
+            const p_low = 0.02425;
+            const p_high = 1 - p_low;
+            
+            let q, r;
+            
+            if (p < p_low) {
+                q = Math.sqrt(-2 * Math.log(p));
+                return (((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+                    ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
+            } else if (p <= p_high) {
+                q = p - 0.5;
+                r = q * q;
+                return (((((a1 * r + a2) * r + a3) * r + a4) * r + a5) * r + a6) * q /
+                    (((((b1 * r + b2) * r + b3) * r + b4) * r + b5) * r + 1);
+            } else {
+                q = Math.sqrt(-2 * Math.log(1 - p));
+                return -(((((c1 * q + c2) * q + c3) * q + c4) * q + c5) * q + c6) /
+                    ((((d1 * q + d2) * q + d3) * q + d4) * q + 1);
+            }
+        }
+
+        // Gerar CSV detalhado
+        function gerarCSVDetalhado() {
+            const identificador = document.getElementById('id-input').value.trim();
+            if (!identificador) {
+                alert("Por favor, insira um identificador para o participante.");
+                document.getElementById('id-input').focus();
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "participante_id,ordem_apresentacao,tentativa_id,condicao,estimulo,resposta,tempo_reacao_ms,acuracia,timestamp,tipo_teste,navegador,resolucao_tela\n";
+
+            estado.tentativas.forEach(tent => {
+                const linha = [
+                    identificador,
+                    tent.ordemApresentacao,
+                    tent.id,
+                    tent.condicao,
+                    tent.estimuloNome,
+                    tent.response || 'sem_resposta',
+                    tent.rt || '',
+                    tent.acuracia,
+                    tent.timestamp,
+                    estado.dadosParticipante.tipoTeste,
+                    `"${estado.dadosParticipante.navegador}"`,
+                    estado.dadosParticipante.resolucaoTela
+                ].join(',');
+                csvContent += linha + '\n';
+            });
+
+            baixarArquivo(csvContent, `gonogo_detalhado_${identificador}_${Date.now()}.csv`);
+        }
+
+        // Gerar CSV resumido
+        function gerarCSVResumido() {
+            const identificador = document.getElementById('id-input').value.trim();
+            if (!identificador) {
+                alert("Por favor, insira um identificador para o participante.");
+                document.getElementById('id-input').focus();
+                return;
+            }
+
+            const res = estado.resultadosCalculados;
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "participante_id,data_inicio,data_fim,tipo_teste,total_tentativas,";
+            csvContent += "taxa_acertos_go_%,taxa_erros_omissao_%,taxa_erros_comissao_%,";
+            csvContent += "tempo_reacao_medio_ms,variabilidade_rt_ms,d_prime,beta,";
+            csvContent += "total_go,total_nogo,acertos_go,erros_omissao,erros_comissao\n";
+
+            const linha = [
+                identificador,
+                estado.dadosParticipante.dataInicio,
+                estado.dadosParticipante.dataFim,
+                estado.dadosParticipante.tipoTeste,
+                estado.tentativas.length,
+                res.taxaAcertosGo.toFixed(2),
+                res.taxaErrosOmissao.toFixed(2),
+                res.taxaErrosComissao.toFixed(2),
+                res.tempoReacaoMedio.toFixed(2),
+                res.variabilidadeRt.toFixed(2),
+                res.dPrime.toFixed(3),
+                res.beta.toFixed(3),
+                res.totalGo,
+                res.totalNoGo,
+                res.acertosGo,
+                res.errosOmissao,
+                res.errosComissao
+            ].join(',');
+            
+            csvContent += linha + '\n';
+
+            baixarArquivo(csvContent, `gonogo_resumo_${identificador}_${Date.now()}.csv`);
+        }
+
+        // Função auxiliar para baixar arquivo
+        function baixarArquivo(conteudo, nomeArquivo) {
+            const encodedUri = encodeURI(conteudo);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", nomeArquivo);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Salvar no LocalStorage
+        function salvarLocalStorage() {
+            const identificador = document.getElementById('id-input').value.trim();
+            if (!identificador) {
+                alert("Por favor, insira um identificador para o participante.");
+                document.getElementById('id-input').focus();
+                return;
+            }
+
+            const dadosCompletos = {
+                identificador,
+                dadosParticipante: estado.dadosParticipante,
+                tentativas: estado.tentativas,
+                resultados: estado.resultadosCalculados,
+                versao: '2.0'
+            };
+
+            const chave = `gonogo_${identificador}_${Date.now()}`;
+            
+            try {
+                localStorage.setItem(chave, JSON.stringify(dadosCompletos));
+                
+                // Manter registro de todas as sessões
+                let sessoes = JSON.parse(localStorage.getItem('gonogo_sessoes') || '[]');
+                sessoes.push({
+                    chave,
+                    identificador,
+                    data: estado.dadosParticipante.dataFim,
+                    tipo: estado.dadosParticipante.tipoTeste
+                });
+                localStorage.setItem('gonogo_sessoes', JSON.stringify(sessoes));
+                
+                alert(`Dados salvos com sucesso!\nChave: ${chave}`);
+            } catch (e) {
+                alert('Erro ao salvar dados localmente. O armazenamento pode estar cheio.');
+                console.error(e);
+            }
+        }
+
+        // Reiniciar teste
+        function reiniciar() {
+            if (confirm('Deseja realmente iniciar um novo teste? Os dados atuais já foram salvos?')) {
+                location.reload();
+            }
+        }
+
+        // Exportar dados para JSON
+        function exportarJSON() {
+            const identificador = document.getElementById('id-input').value.trim();
+            if (!identificador) {
+                alert("Por favor, insira um identificador para o participante.");
+                return;
+            }
+
+            const dadosCompletos = {
+                identificador,
+                dadosParticipante: estado.dadosParticipante,
+                tentativas: estado.tentativas,
+                resultados: estado.resultadosCalculados,
+                versao: '2.0'
+            };
+
+            const json = JSON.stringify(dadosCompletos, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `gonogo_${identificador}_${Date.now()}.json`;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Atalhos de teclado
+        document.addEventListener('keydown', function(e) {
+            // Espaço para clicar no estímulo durante o teste
+            if (e.code === 'Space' && estado.testeEmAndamento && !estado.respostaDada) {
+                e.preventDefault();
+                document.getElementById('estimulo').click();
+            }
+            
+            // F11 para tela cheia
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+            
+            // Escape para sair do teste (com confirmação)
+            if (e.key === 'Escape' && estado.testeEmAndamento) {
+                if (confirm('Deseja realmente cancelar o teste?')) {
+                    location.reload();
+                }
+            }
+        });
+
+        // Prevenir saída acidental da página durante o teste
+        window.addEventListener('beforeunload', function(e) {
+            if (estado.testeEmAndamento) {
+                e.preventDefault();
+                e.returnValue = 'O teste está em andamento. Tem certeza que deseja sair?';
+            }
+        });
+
+        // Detectar visibilidade da página
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && estado.testeEmAndamento) {
+                console.log('Atenção: Página perdeu foco durante o teste');
+                // Você pode adicionar um registro disso nos dados se necessário
+            }
+        });
+
+        // Verificar suporte a recursos
+        window.addEventListener('load', function() {
+            // Verificar suporte a AudioContext
+            if (!window.AudioContext && !window.webkitAudioContext) {
+                console.warn('AudioContext não suportado. Sons desabilitados.');
+            }
+            
+            // Verificar suporte a Fullscreen API
+            if (!document.fullscreenEnabled && !document.webkitFullscreenEnabled) {
+                document.getElementById('fullscreen-btn').style.display = 'none';
+            }
+            
+            // Verificar localStorage
+            try {
+                localStorage.setItem('test', 'test');
+                localStorage.removeItem('test');
+            } catch(e) {
+                console.warn('localStorage não disponível');
+            }
+            
+            console.log('Tarefa Go-NoGo v2.0 carregada com sucesso');
+        });
+
+        // Função para análise de dados agregados (útil para múltiplos participantes)
+        function analisarDadosAgregados() {
+            try {
+                const sessoes = JSON.parse(localStorage.getItem('gonogo_sessoes') || '[]');
+                
+                if (sessoes.length === 0) {
+                    console.log('Nenhuma sessão encontrada no localStorage');
+                    return;
+                }
+                
+                console.log(`Total de sessões armazenadas: ${sessoes.length}`);
+                
+                const dados = [];
+                sessoes.forEach(sessao => {
+                    const dadosSessao = localStorage.getItem(sessao.chave);
+                    if (dadosSessao) {
+                        dados.push(JSON.parse(dadosSessao));
+                    }
+                });
+                
+                // Calcular médias
+                if (dados.length > 0) {
+                    const medias = {
+                        taxaAcertosGo: 0,
+                        tempoReacaoMedio: 0,
+                        dPrime: 0,
+                        participantes: dados.length
+                    };
+                    
+                    dados.forEach(d => {
+                        if (d.resultados) {
+                            medias.taxaAcertosGo += d.resultados.taxaAcertosGo;
+                            medias.tempoReacaoMedio += d.resultados.tempoReacaoMedio;
+                            medias.dPrime += d.resultados.dPrime;
+                        }
+                    });
+                    
+                    medias.taxaAcertosGo /= dados.length;
+                    medias.tempoReacaoMedio /= dados.length;
+                    medias.dPrime /= dados.length;
+                    
+                    console.table(medias);
+                    return medias;
+                }
+            } catch(e) {
+                console.error('Erro ao analisar dados agregados:', e);
+            }
+        }
+
+        // Adicionar ao objeto window para acesso via console
+        window.GoNoGo = {
+            analisarDados: analisarDadosAgregados,
+            exportarTodosDados: function() {
+                const sessoes = JSON.parse(localStorage.getItem('gonogo_sessoes') || '[]');
+                const todosDados = [];
+                
+                sessoes.forEach(sessao => {
+                    const dados = localStorage.getItem(sessao.chave);
+                    if (dados) {
+                        todosDados.push(JSON.parse(dados));
+                    }
+                });
+                
+                const json = JSON.stringify(todosDados, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `gonogo_todos_dados_${Date.now()}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                
+                console.log(`Exportados dados de ${todosDados.length} sessões`);
+            },
+            limparDados: function() {
+                if (confirm('Tem certeza que deseja limpar TODOS os dados salvos?')) {
+                    const sessoes = JSON.parse(localStorage.getItem('gonogo_sessoes') || '[]');
+                    sessoes.forEach(s => localStorage.removeItem(s.chave));
+                    localStorage.removeItem('gonogo_sessoes');
+                    console.log('Todos os dados foram removidos');
+                }
+            }
+        };
+    </script>
+</body>
+</html>
